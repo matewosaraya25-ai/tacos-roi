@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taco Stand ROI Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth transitions and animations */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-amber-50 min-h-screen py-8 px-4">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                🌮 Taco Stand ROI Calculator
+            </h1>
+            <p class="text-gray-600 text-sm md:text-base">
+                See how customer retention impacts your revenue
+            </p>
+        </div>
+
+        <!-- Calculator Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6 fade-in">
+            <!-- Input Section -->
+            <div class="space-y-6 mb-8">
+                <!-- Average Ticket Price -->
+                <div>
+                    <label for="ticketPrice" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Average Ticket Price ($)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">$</span>
+                        <input 
+                            type="number" 
+                            id="ticketPrice" 
+                            placeholder="12.50"
+                            min="0"
+                            step="0.01"
+                            class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all text-lg"
+                        >
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Average order value per customer</p>
+                </div>
+
+                <!-- Monthly Customer Volume -->
+                <div>
+                    <label for="customerVolume" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Monthly Customer Volume
+                    </label>
+                    <input 
+                        type="number" 
+                        id="customerVolume" 
+                        placeholder="500"
+                        min="0"
+                        step="1"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all text-lg"
+                    >
+                    <p class="mt-1 text-xs text-gray-500">Total customers per month</p>
+                </div>
+            </div>
+
+            <!-- Calculate Button -->
+            <button 
+                id="calculateBtn"
+                class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold py-4 rounded-lg hover:from-orange-600 hover:to-amber-600 active:scale-98 transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
+            >
+                Calculate ROI
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden space-y-4 fade-in">
+            <!-- Current Revenue -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Current Monthly Revenue</h3>
+                </div>
+                <p id="currentRevenue" class="text-3xl font-bold text-gray-900">$0.00</p>
+            </div>
+
+            <!-- 5% Retention Increase -->
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-lg p-6 border-2 border-orange-200">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="text-sm font-semibold text-orange-800 uppercase tracking-wide mb-1">5% Retention Increase</h3>
+                        <p class="text-xs text-orange-700">Additional monthly revenue</p>
+                    </div>
+                    <div class="bg-orange-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
+                        +5%
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <p id="revenue5Percent" class="text-3xl font-bold text-orange-900">$0.00</p>
+                    <p class="text-sm text-orange-700">
+                        <span id="annual5Percent" class="font-semibold">$0.00</span> per year
+                    </p>
+                </div>
+            </div>
+
+            <!-- 10% Retention Increase -->
+            <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl shadow-lg p-6 border-2 border-amber-200">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="text-sm font-semibold text-amber-800 uppercase tracking-wide mb-1">10% Retention Increase</h3>
+                        <p class="text-xs text-amber-700">Additional monthly revenue</p>
+                    </div>
+                    <div class="bg-amber-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
+                        +10%
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <p id="revenue10Percent" class="text-3xl font-bold text-amber-900">$0.00</p>
+                    <p class="text-sm text-amber-700">
+                        <span id="annual10Percent" class="font-semibold">$0.00</span> per year
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Button -->
+        <button 
+            id="resetBtn"
+            class="hidden w-full mt-4 bg-gray-100 text-gray-700 font-semibold py-3 rounded-lg hover:bg-gray-200 active:scale-98 transition-all duration-200"
+        >
+            Reset Calculator
+        </button>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const ticketPriceInput = document.getElementById('ticketPrice');
+        const customerVolumeInput = document.getElementById('customerVolume');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultsSection = document.getElementById('results');
+        
+        const currentRevenueEl = document.getElementById('currentRevenue');
+        const revenue5PercentEl = document.getElementById('revenue5Percent');
+        const revenue10PercentEl = document.getElementById('revenue10Percent');
+        const annual5PercentEl = document.getElementById('annual5Percent');
+        const annual10PercentEl = document.getElementById('annual10Percent');
+
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+
+        // Calculate and display results
+        function calculateROI() {
+            const ticketPrice = parseFloat(ticketPriceInput.value) || 0;
+            const customerVolume = parseInt(customerVolumeInput.value) || 0;
+
+            // Validate inputs
+            if (ticketPrice <= 0 || customerVolume <= 0) {
+                alert('Please enter valid values for both fields.');
+                return;
+            }
+
+            // Calculate current monthly revenue
+            const currentRevenue = ticketPrice * customerVolume;
+
+            // Calculate revenue increases
+            const revenue5Percent = currentRevenue * 0.05;
+            const revenue10Percent = currentRevenue * 0.10;
+
+            // Calculate annual increases
+            const annual5Percent = revenue5Percent * 12;
+            const annual10Percent = revenue10Percent * 12;
+
+            // Update DOM
+            currentRevenueEl.textContent = formatCurrency(currentRevenue);
+            revenue5PercentEl.textContent = formatCurrency(revenue5Percent);
+            revenue10PercentEl.textContent = formatCurrency(revenue10Percent);
+            annual5PercentEl.textContent = formatCurrency(annual5Percent);
+            annual10PercentEl.textContent = formatCurrency(annual10Percent);
+
+            // Show results and reset button
+            resultsSection.classList.remove('hidden');
+            resetBtn.classList.remove('hidden');
+            
+            // Scroll to results smoothly
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        // Reset calculator
+        function resetCalculator() {
+            ticketPriceInput.value = '';
+            customerVolumeInput.value = '';
+            resultsSection.classList.add('hidden');
+            resetBtn.classList.add('hidden');
+            ticketPriceInput.focus();
+        }
+
+        // Event listeners
+        calculateBtn.addEventListener('click', calculateROI);
+        resetBtn.addEventListener('click', resetCalculator);
+
+        // Allow Enter key to calculate
+        [ticketPriceInput, customerVolumeInput].forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    calculateROI();
+                }
+            });
+        });
+
+        // Auto-format inputs
+        ticketPriceInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (value && (isNaN(value) || parseFloat(value) < 0)) {
+                e.target.value = '';
+            }
+        });
+
+        customerVolumeInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (value && (isNaN(value) || parseInt(value) < 0)) {
+                e.target.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
